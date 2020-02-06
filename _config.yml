@@ -1,1 +1,5 @@
+title: Welcome
+logo: /assets/img/logo.png
+description: Stochastic modelling of epidemic models.
+show_downloads: true
 theme: jekyll-theme-minimal
