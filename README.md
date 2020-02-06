@@ -1,1 +1,1 @@
-# stochastic_epi_models_course
+# Welcome
