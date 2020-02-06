@@ -1,0 +1,33 @@
+
+# Chain-Binomial model parameter inference
+
+model{
+
+  # likelihood
+  # ll = a*log(pow(q, 2)) + b*log(p*pow(q, 2)) + c*log(2*pow(p, 2)*q) + d*log(pow(p, 2))
+
+  # multinomial distribution
+  X[1:4] ~ dmulti(prob[1:4], N)
+  
+  # seting first probability as the baseline/anchor   
+  phi[1]  <- 1
+  prob[1] <- 1/sum(phi[1:4])
+  
+  # tranforming to probabilities
+  for (c in 2:4) {
+      
+    log(phi[c]) <- beta[c]
+    prob[c] <- phi[c]/sum(phi[1:4])
+  }
+ 
+      
+  # vague priors
+  for (c in 2:4) {
+ 
+    beta[c] ~ dnorm(0, 1.0E-6)
+  }
+
+  # predicted number of counts
+  X_pred = prob*N
+
+}

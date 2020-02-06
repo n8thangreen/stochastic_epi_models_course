@@ -1,0 +1,221 @@
+---
+title: "Worksheet: Chain Binomial models"
+author: "Nathan Green, Imperial College London"
+date: "14/01/2020"
+output:
+  pdf_document:
+    number_sections: true 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+In this practical we will explore the use of the chain Binomial models for infectious diseases, introduced in the lectures.
+
+
+# Inference
+
+First we will infer the paramters of the model for the measles example given in the lecture.
+
+For chain observed sample sizes $a, b, c, d$ and probability of infection and avoidance $p$ and $q = 1- p$, respectively.
+Define a log-likelihood function corresponding to the data as follows.
+
+$$
+l = a \ln(q^2) + b \ln(p q^2) +c \ln(2 p^2 q) + d \ln(p^2)
+$$
+
+This can be coded in R as
+
+```{r}
+loglik_measles <- function(a,b,c,d) {
+  
+  function(p){
+    q <- 1 - p
+    a*log(q^2) + b*log(p*q^2) +c*log(2*p^2*q) + d*log(p^2)
+  }
+}
+```
+
+This is an example of a _closure_ which returns a function with parameters `a,b,c,d` defined.
+We can check this with the data from the lecture.
+
+```{r}
+loglik_dat <- loglik_measles(a = 34,
+                             b = 25,
+                             c = 36,
+                             d = 239)
+
+loglik_dat
+```
+
+To find the MLE we identify the probability corresponding to the largest likelihood in the sequence of discrete probabilities we just created.
+
+```{r}
+p <- seq(0, 1, 0.005)
+
+p_hat <- p[loglik_dat(p) >= max(loglik_dat(p))] 
+p_hat # 0.79
+
+q_hat <- 1 - p_hat
+q_hat # 0.21
+```
+
+
+In the same way as for the previous likelihood practical, let's plot the log-likelihood curve.
+We indicate the MLE $\hat{p}$ with a red line.
+
+```{r}
+plot(p, loglik_dat(p), type = "l")
+abline(v = p_hat, col = "red")
+abline(h = max(loglik_dat(p)), col = "red")
+```
+
+We are now in a position to calculate the expected number of households for each types of chain from the measles data.
+The total number of households is $n = 334$.
+
+```{r}
+n <- 334
+
+# {1}
+n*q_hat^2
+
+# {1^2}
+n*2*p_hat*q_hat^2
+
+# {1^3}
+n*2*p_hat^2*q_hat
+
+# {12}
+n*p_hat^2
+```
+
+## Your turn
+
+Can you extend the previous model to households of size 4.
+For data $n = 500$, and $a = 11, b = 12, c = 14, d = 27, e = 49, f = 63, g = 152, h = 172$.
+
+* Define the log-likelihood function.
+* Plot the log-likelihood curve.
+* What is the MLE and the expected number of households for each type of chain?
+
+
+# Stochastic simulation
+
+We can generate our own chain Binomial data using forward simulation.
+
+## Multinomial distibution
+
+A simple way of doing this is to sample from a multinomial distibution with probabilities coresponding to each of the types of chain. For this formulation its easy to see the connection with the likelihood approach above.
+
+For example, for households of size 3:
+
+```{r}
+p <- 0.8
+q <- 1 - p
+rmultinom(n = 1,
+          size = 334,
+          prob = c(q^2, p*q^2, 2*p^2*q, p^2))
+```
+
+Households of size 4:
+
+```{r}
+p <- 0.7
+q <- 1 - p
+rmultinom(n = 1,
+          size = 500,
+          prob = c(q^3, 3*p*q^4, 6*p^2*q^4, 6*p^3*q^3, 3*p^3*q^2, 3*p^2*q^2, 3*p^3*q, p^3))
+```
+
+## Reed-Frost model
+
+We can define the model using the transition probabilities to update the number of susceptibles, infectives and removed at each time step.
+
+$$
+S_{t+1} = S_t - I_{t+1}, \qquad R_{t+1} = R_t + I_t
+$$
+ 
+Let us create a function to simulate this process. The input parameters are defined as follows:
+
+* `q` is athe pairwise probability of _avoiding_ potentially infectious contact
+* `R0` is the basic reproduction number
+* `MAXTIME` is the maximum number of time steps the simulation will run for
+* `I0` is the initial number of infectives
+* `S0` is the initial number of susceptibles
+
+```{r}
+sir_cb <- function(q = NA,
+                   R0 = NA,
+                   N,
+                   MAXTIME = 100,
+                   I0 = 1,
+                   S0 = N - I0){
+  if (is.na(q))
+    q <- 1 - R0/N
+  
+  # initial conditions
+  I <- I0
+  S <- S0
+  
+  for(t in seq_len(MAXTIME)){
+    
+    I <- c(I, rbinom(n = 1,
+                     size = S[t],
+                     prob = 1 - q^I[t]))
+    
+    S <- c(S, S[t] - I[t + 1])
+    
+    if(I[t + 1] == 0) break
+    
+  }
+  
+  return(
+    data.frame(t = 0:t,
+               I = I,
+               S = S))
+}
+```
+
+At each time step a susceptible becomes infected with probability `1 - q^I[t]`.
+When there are no more infectives  then the function stop, indicated by the `break` function.
+
+Let us check that this function does what we expect.
+For a single household we get the following.
+
+```{r}
+sir_cb(q = 0.5, N = 3)
+```
+
+
+We can now replicate the output from the measles example given in the lecture.
+First we create a list object to put the results in to.
+Then we simulate $n = 334$ households of size 3 by looping using the `for` command.
+While we're at it we also extract the number of infectives into a separate variable called `inf`.
+
+```{r}
+res <- list()
+inf <- NULL
+
+for (i in 1:334){
+  
+  res[[i]] <- sir_cb(q = 0.21, N = 3)
+  inf[i] <- paste(res[[i]]$I, collapse = ",")
+}
+```
+
+
+```{r}
+table(inf)
+```
+
+
+## Your turn
+
+* Change the `q` and `N` parameters to explore the model behaviour.
+* What would you expect to see for larger $q$ or larger $N$?
+
+

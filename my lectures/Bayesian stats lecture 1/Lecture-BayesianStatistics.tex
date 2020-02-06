@@ -1,0 +1,183 @@
+%%%%%% Compile using latex, then dvips, then ps2pdf %%%%%%%%%%%%%
+
+\documentclass{beamer}
+
+%\documentclass[handout]{beamer}
+
+%\includeonlyframes{current}
+
+\mode<presentation>
+{
+%  \usetheme{Warsaw}
+%  \usetheme{Frankfurt}
+%  \usetheme{Singapore}
+\usetheme{Boadilla}
+}
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+
+\usepackage{tikz}
+\usepackage{pgflibraryshapes}
+\usetikzlibrary{shapes}
+
+\usepackage{graphics}
+%\usepackage[draft]{graphics}
+
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{pgfpages}
+\usepackage{fancybox}
+\usepackage{threeparttable}
+\usepackage{tikz}
+\usepackage{bbding}
+
+\setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+
+\setbeamercolor{equation.box}{fg=blue,bg=yellow!50!white}
+\setbeamercolor{postit}{fg=black,bg=yellow!75!white}
+
+
+%\graphicspath{{D:/teaching/figs/}}
+
+%Additional commands
+
+
+
+% Abbreviations for equations and lists
+
+\newenvironment{shitemize}{
+\begin{itemize}
+\setlength{\parskip}{0pt} \setlength{\itemsep}{10pt}
+\setlength{\parsep}{0pt}
+%\setlength{\baselineskip}{7mm}
+\setlength{\baselineskip}{8mm} }{\end{itemize}}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\I}{\item}
+\newcommand{\pr}[1]{\parbox[c]{10 cm}{\fontsize{8}{8} \selectfont \centering #1}}
+
+% for a bulleted list nested within another bulleted list
+\newcommand{\nestedbi}{\begin{itemize}}
+\newcommand{\nestedei}{\end{itemize}}
+
+% for a bulleted list with larger spacing between lines
+\newcommand{\bibig}{\begin{itemize}}
+\newcommand{\eibig}{\end{itemize}}
+
+\newenvironment{senumerate}{\begin{enumerate}
+\setlength{\parskip}{0pt} \setlength{\itemsep}{3pt}
+\setlength{\parsep}{0pt} \setlength{\baselineskip}{10mm}
+}{\end{enumerate}}
+
+
+\newenvironment{shenumerate}{\begin{enumerate}
+\setlength{\parskip}{0pt}
+\setlength{\itemsep}{2pt}
+\setlength{\parsep}{0pt}
+}{\end{enumerate}}
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+
+\newcommand{\beas}{\begin{eqnarray*}}
+\newcommand{\eeas}{\end{eqnarray*}}
+
+\newcommand{\ben}{\begin{enumerate}}
+\newcommand{\een}{\end{enumerate}}
+
+\newcommand{\beqs}{\begin{eqnarray*}}
+\newcommand{\eeqs}{\end{eqnarray*}}
+
+
+
+% for a section heading
+\newcommand{\sect}[1]{
+     {\large{\bf #1}}\vspace{0.05in}}
+
+% for a subsection heading
+\newcommand{\subsect}[1]{{\bf #1}\vspace{0.05in}}
+
+% for a subsubsection heading
+\newcommand{\subsubsect}[1]{{\it{#1}}\vspace{0.05in}}
+
+% Misc.
+\newcommand{\etal}{{\it et al.}}
+\newcommand{\winbugs}{{OpenBUGS }}
+
+% spaces
+\newcommand{\negsp}{\vspace{-0.5cm}}
+\newcommand{\possp}{\vspace{0.5cm}}
+
+% Maths
+%\usepackage{D:/teaching/maths}     % my maths style file
+
+%\newcommand{\EE}{\mathrm{I\!E}}  %% Expectation
+%\newcommand{\VV}{\mathrm{Var}} %% Variance
+
+%\newcommand{\bbeta}{\boldsymbol{\beta}}
+%\newcommand{\btheta}{\boldsymbol{\theta}}
+%\newcommand{\bnu}{\boldsymbol{\nu}}
+%\newcommand{\pmat}{\boldsymbol{p}}
+%\newcommand{\bx}{\boldsymbol{x}}
+
+%\newcommand{\pr}{\ensuremath{\mathbb{P}}}
+
+%\newcommand{\sis}{{\sigma^2}}
+
+\newcommand{\pari}{\hspace{\parindent}}
+
+\title[Bayesian Statistics (AIMS)]
+{\Huge{Lecture \vspace{5mm}\\Bayesian inference}}
+
+\author[Nathan Green]
+{}
+\date[]
+{}
+
+
+\begin{document}
+
+\begin{frame}[t]
+  \titlepage
+
+\end{frame}
+
+\frame{
+\frametitle{Learning objectives}
+After this session students should be able to:\vspace{2mm}
+\begin{itemize}
+  \item List the fundamental components of Bayesian inference
+  \vspace{2mm}
+  \item Describe Bayes' Theorem
+  \vspace{2mm}
+  \item Describe what a conjugate model is and its features
+  \vspace{2mm}
+  \item Describe the conjugate Binomial-Beta, Normal-Normal and Poisson-Gamma models
+    \vspace{2mm}
+    \item Compare prior and posterior distributions
+\end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\include{parta}
+
+\begin{frame}
+\begin{center}
+{\Huge{BREAK}}
+\end{center}
+\end{frame}
+
+\include{partb}
+
+\end{document}

@@ -1,0 +1,122 @@
+---
+title: "Worksheet: Chain Binomial models using BUGS"
+author: "Nathan Green, Imperial College London"
+date: "5/02/2020"
+output:
+  pdf_document:
+    number_sections: true 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+In this practical we will revisit the chain-binomial model we met for the likelihood practical and implement it in the Bayesian software BUGS via R.
+
+# Measle example
+
+We will infer the probability of infection $p$ and estimate subpopulation sizes.
+Open up R or RStudio and start a new session.
+Make sure to have a BUGS implementation installed, e.g. OpenBUG or jags. We will be using jags but the code is identical unless stated otherwise.
+The BUGS script is in file `chain-binomial-hh3.txt`.
+
+First load packages
+
+```{r}
+library(R2jags)
+library(R2WinBUGS)
+```
+
+Next we define the setting of the MCMC algorithm.
+Since this is a simple example we won't need many iterations and burn-in and thinning can be small too.
+
+```{r}
+n_iter <- 1000
+n_burnin <- 10
+n_thin <- 1
+```
+
+We need to tell BUGS which parameters we wish to 'monitor', that is which to save for us to use afterwards.
+We will choose the vector of probabilities and predicted subpopulation sizes.
+The BUGS code will make their definition more clear.
+
+```{r}
+params <-
+  c("prob",
+    "X_pred")
+```
+
+Importantly, we will now specify the data we are going to fit to.
+Recall from the lecture that we have a total sample size of 334.
+This is defined in a `list` object, because it allows us to have different length entries, unlike say a matrix.
+
+```{r}
+jags_dat <- list(X = c(34, 25, 36, 239),
+                 N = 334)
+```
+
+I have the BUGS code in the following directory but change it to march where you have saved your file.
+
+```{r}
+my_file_location <- "C:/Users/ngreen1/Google Drive/AIMS/my practicals/chain-binomial-hh3.txt"
+```
+
+Finally, we are in a position to run the MCMC sampler. If you are using OpenBUGS then use `bugs()` instead of `jags()`.
+
+```{r}
+out <- jags(jags_dat,
+            parameters.to.save = params,
+            model.file = my_file_location,
+            n.chains = 2,
+            n.iter = n_iter,
+            n.burnin = n_burnin,
+            n.thin = n_thin,
+            DIC = FALSE,
+            working.directory = getwd(),
+            progress.bar = "text")
+```
+
+Now we have run the model we can inspect the output.
+If we `attach` the BUGSourput to the workspace then we don't have to keep writing `out`.
+
+```{r}
+R2WinBUGS::attach.bugs(out$BUGSoutput)
+```
+
+Using the base R plotting features we can view the posterior distributions of the subsample sizes.
+We have also indicated the sample value with vertical red lines.
+
+```{r}
+par(mfrow = c(2,2))
+
+plot(density(X_pred[,1]), main = "a")
+abline(v = 34, col = "red")
+
+plot(density(X_pred[,2]), main = "b")
+abline(v = 25, col = "red")
+
+plot(density(X_pred[,3]), main = "c")
+abline(v = 36, col = "red")
+
+plot(density(X_pred[,4]), main = "d")
+abline(v = 239, col = "red")
+```
+
+Compare this to the analysis done with the likelihood approach in previous work.
+
+
+# Your turn
+
+Can you extend the previous model to households of size 4.
+For data $n = 500$, and $a = 11, b = 12, c = 14, d = 27, e = 49, f = 63, g = 152, h = 172$.
+
+You will need to
+
+* In the BUGS code, modify the `prob` and `phi` vectors to have length 4.
+* Change the loop to go up to 4
+* Change `jags_dat`
+
+Compare the output to the different models.
+
