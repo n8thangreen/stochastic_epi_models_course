@@ -4,7 +4,7 @@
 Lectures:
 
 * [Bayesian Inference](https://github.com/n8thangreen/stochastic_epi_models_course/blob/master/my%20lectures/Bayesian%20stats%20lecture%201/Lecture-BayesianStatistics.pdf)
-* * [Introduction to MCMC wiht WibBUGS](https://github.com/n8thangreen/stochastic_epi_models_course/blob/master/my%20lectures/Bayesian%20stats%20lecture%202/Lecture-MCMC.pdf)
+* [Introduction to MCMC with WinBUGS](https://github.com/n8thangreen/stochastic_epi_models_course/blob/master/my%20lectures/Bayesian%20stats%20lecture%202/Lecture-MCMC.pdf)
 * [Stochastic SIR models](https://github.com/n8thangreen/stochastic_epi_models_course/blob/master/my%20lectures/Stochastic%20SIR%20models.pdf)
 
 Practicals:
